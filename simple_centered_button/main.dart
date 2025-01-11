@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
         body: 
           Center(
             child: 
-              ElevatedButton(onPressed: () {}, child: Text("this is a button"))
+              ElevatedButton(onPressed: () {print("i got pressed :)\n");}, child: Text("this is a button"))
           )
       )
     );
