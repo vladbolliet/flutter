@@ -1,5 +1,4 @@
 //date: 11 Jan 2025
-//new edit on 14 Jan 2025
 
 import 'package:flutter/material.dart';
 import 'constants/images.dart';  // For image paths
@@ -13,6 +12,34 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  @override
+  Widget build(BuildContext context){
+    return MaterialApp(
+      home: MyHomePage()
+    );
+  }
+}
+
+// MyHomePage Widget Class
+
+class MyHomePage extends StatefulWidget{
+  @override
+  _MyHomePageState createState() => _MyHomePageState(); 
+}
+
+//State for MyHomePage
+
+class _MyHomePageState extends State<MyHomePage>{
+
+  int _counter = 0; //counter
+  bool _isSwitched = false; //for toggle
+
+  void _incrementCounter(){ //function for incrementing counter
+    setState(() => _counter++);
+  }
+
+  // main function
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -44,22 +71,29 @@ class MyApp extends StatelessWidget {
         body:
           Stack(
             children: [
-              Padding(
-                padding: EdgeInsets.only(left: 40, top: 100),
-                child: Image.asset(codeimg)
+              Switch(
+                value: _isSwitched,
+                onChanged: (v){
+                  setState(() => _isSwitched = v);
+                }
               ),
+              if(_isSwitched)
+                Padding(
+                  padding: EdgeInsets.only(left: 40, top: 100),
+                  child: Image.asset(codeimg)
+                ),
               Padding(
                 padding: const EdgeInsets.only(top: 610, left: 300),
                 child: 
                   FloatingActionButton(
-                    onPressed: (){ print("hello"); },
+                    onPressed: (){ _incrementCounter(); },
                     backgroundColor: bluegrey,
                     child: const Icon(Icons.add)
                   )
               ),
-              const Center(
+              Center(
                 child: Text(
-                  "centered text",
+                  "Counter value: $_counter",
                   style: TextStyle(
                       fontSize: 24
                   )
