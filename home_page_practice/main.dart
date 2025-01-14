@@ -33,16 +33,30 @@ class _MyHomePageState extends State<MyHomePage>{
 
   int _counter = 0; //counter
   bool _isSwitched = false; //for toggle
+  bool _isDarkTheme = false; //for theme
 
   void _incrementCounter(){ //function for incrementing counter
     setState(() => _counter++);
   }
+
+  ThemeData _lightTheme =  ThemeData(
+    primaryColor: bluegrey,
+    brightness: Brightness.light,
+    appBarTheme: AppBarTheme(backgroundColor: bluegrey)
+  );
+
+  ThemeData _darkTheme =  ThemeData(
+    primaryColor: bluegrey,
+    brightness: Brightness.dark,
+    appBarTheme: AppBarTheme(backgroundColor: bluegrey)
+  );
 
   // main function
   
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: _isDarkTheme ? _darkTheme : _lightTheme,
       home: Scaffold(
 
         // app bar
@@ -82,21 +96,35 @@ class _MyHomePageState extends State<MyHomePage>{
                   padding: EdgeInsets.only(left: 40, top: 100),
                   child: Image.asset(codeimg)
                 ),
-              Padding(
-                padding: const EdgeInsets.only(top: 610, left: 300),
-                child: 
-                  FloatingActionButton(
-                    onPressed: (){ _incrementCounter(); },
-                    backgroundColor: bluegrey,
-                    child: const Icon(Icons.add)
+              Column(
+                children: [
+                  SizedBox(height: 450),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FloatingActionButton(
+                        onPressed: (){ _incrementCounter(); },
+                        backgroundColor: bluegrey,
+                        child: const Icon(Icons.add)
+                      )
+                    ]
                   )
+                ]
               ),
-              Center(
+              Padding(
+                padding: EdgeInsets.only(top: 540, left: 105),
                 child: Text(
                   "Counter value: $_counter",
                   style: TextStyle(
                       fontSize: 24
                   )
+                )
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 600, left: 130),
+                child: ElevatedButton(
+                  onPressed: () => setState(() => _counter = 0),
+                  child: Text("Reset counter"),
                 )
               )
             ]
@@ -111,8 +139,8 @@ class _MyHomePageState extends State<MyHomePage>{
                   child: Text("test"),
                 ),
                 ListTile(
-                  title: const Text('item 1'),
-                  onTap:() => print("some text"),
+                  title: const Text('Switch to dark theme'),
+                  onTap:() => setState(() =>_isDarkTheme = !_isDarkTheme), //switch
                 ),
                 ListTile(
                   title: const Text('item 2'),
