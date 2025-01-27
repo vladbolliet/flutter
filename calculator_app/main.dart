@@ -3,17 +3,25 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp>{
+
+  int typedNumber = 0;
 
   @override
   Widget build(BuildContext context){
     return MaterialApp(
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.black, 
+        scaffoldBackgroundColor: Colors.black,
         textTheme: TextTheme(
           bodyLarge: TextStyle(color: Colors.white, fontSize: 26), // normal text
           labelLarge: TextStyle(color: Colors.white, fontSize: 35) // button text
@@ -29,7 +37,29 @@ class MyApp extends StatelessWidget {
         body: Stack(
           children: [
             // result
-
+            Positioned(
+              top: MediaQuery.of(context).size.height*0.28,
+              left: 0,
+              right:0,
+              child: Container(
+                height: MediaQuery.of(context).size.height*0.10,
+                child: Row(
+                  children: [
+                    Spacer(),
+                    Container(
+                      margin: EdgeInsets.only(left: 10, right: 10),
+                      child: Text(
+                        "$typedNumber",
+                        style: TextStyle(
+                          fontSize: 60,
+                          color: Colors.white
+                        )
+                      )
+                    )
+                  ]
+                )
+              )
+            ),
             // buttons
 
             Positioned( // first line
@@ -50,7 +80,10 @@ class MyApp extends StatelessWidget {
                       ),
                       child: TextButton(
                         child: Text("C", style: TextStyle(color: Colors.black)),
-                        onPressed:() => print("pressed C"),
+                        onPressed:() {
+                          print("pressed C");
+                          setState(() => typedNumber = 0);
+                        }
                       )
                     ),
                     Spacer(),
@@ -92,7 +125,10 @@ class MyApp extends StatelessWidget {
                       ),
                       child: TextButton(
                         child: Text("7"),
-                        onPressed:() => print("pressed 7"),
+                        onPressed:() {
+                          print("pressed 7");
+                          setState(() => typedNumber = typedNumber * 10 + 7);
+                        }
                       )
                     ),
                     Container(
@@ -108,7 +144,10 @@ class MyApp extends StatelessWidget {
                           "8",
                           style: TextStyle(fontSize: 40)
                         ),
-                        onPressed:() => print("pressed 8"),
+                        onPressed:() {
+                          print("pressed 8");
+                          setState(() => typedNumber = typedNumber * 10 + 8);
+                        }
                       )
                     ),
                     Container(
@@ -121,7 +160,10 @@ class MyApp extends StatelessWidget {
                       ),
                       child: TextButton(
                         child: Text("9"),
-                        onPressed:() => print("pressed 9"),
+                        onPressed:() {
+                          print("pressed 9");
+                          setState(() => typedNumber = typedNumber * 10 + 9);
+                        }
                       )
                     ),
                     Spacer(),
@@ -163,7 +205,10 @@ class MyApp extends StatelessWidget {
                       ),
                       child: TextButton(
                         child: Text("4"),
-                        onPressed:() => print("pressed 4"),
+                        onPressed:() {
+                          print("pressed 4");
+                          setState(() => typedNumber = typedNumber * 10 + 4);
+                        }
                       )
                     ),
                     Container(
@@ -179,7 +224,10 @@ class MyApp extends StatelessWidget {
                           "5",
                           style: TextStyle(fontSize: 40)
                         ),
-                        onPressed:() => print("pressed 5"),
+                        onPressed:() {
+                          print("pressed 5");
+                          setState(() => typedNumber = typedNumber * 10 + 5);
+                        }
                       )
                     ),
                     Container(
@@ -192,7 +240,10 @@ class MyApp extends StatelessWidget {
                       ),
                       child: TextButton(
                         child: Text("6"),
-                        onPressed:() => print("pressed 6"),
+                        onPressed:() {
+                          print("pressed 6");
+                          setState(() => typedNumber = typedNumber * 10 + 6);
+                        }
                       )
                     ),
                     Spacer(),
@@ -234,7 +285,10 @@ class MyApp extends StatelessWidget {
                       ),
                       child: TextButton(
                         child: Text("1"),
-                        onPressed:() => print("pressed 1"),
+                        onPressed:() {
+                          print("pressed 1");
+                          setState(() => typedNumber = typedNumber * 10 + 1);
+                        }
                       )
                     ),
                     Container(
@@ -250,7 +304,10 @@ class MyApp extends StatelessWidget {
                           "2",
                           style: TextStyle(fontSize: 40)
                         ),
-                        onPressed:() => print("pressed 2"),
+                        onPressed:() {
+                          print("pressed 2");
+                          setState(() => typedNumber = typedNumber * 10 + 2);
+                        }
                       )
                     ),
                     Container(
@@ -263,7 +320,10 @@ class MyApp extends StatelessWidget {
                       ),
                       child: TextButton(
                         child: Text("3"),
-                        onPressed:() => print("pressed 3"),
+                        onPressed:() {
+                          print("pressed 3");
+                          setState(() => typedNumber = typedNumber * 10 + 3);
+                        }
                       )
                     ),
                     Spacer(),
