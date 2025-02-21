@@ -1,0 +1,1 @@
+const codeimg = 'assets/code.jpeg';
