@@ -63,16 +63,50 @@ class TaskTimerPageState extends State<TaskTimerPage> {
                         ]
                       ),
                     ),
-                    onPressed: () => print("pressed manual input button\n"),
+                    onPressed: () {
+                      print("pressed manual input button\n");
+                      setState(() {
+                        _StartNewTaskIsExpanded = true;
+                      });
+                    },
                   )
                 )
               ]
               else ... [
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.15,
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      padding: EdgeInsets.only(right: 20, bottom: 10),
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          textStyle: TextStyle(fontSize: 18),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Text(
+                            "Back",
+                            style: TextStyle(color: const Color.fromARGB(255, 93, 93, 93), fontSize: 18)
+                          ),
+                        ),
+                        onPressed: () {
+                          print("pressed back button\n");
+                          setState(() {
+                            _StartNewTaskIsExpanded = false;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
                 AnimatedPositioned(
                   duration: Duration(milliseconds: 500),
                   child: Padding(
                     padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).size.height * 0.2,
+                      //top: MediaQuery.of(context).size.height * 0.2,
                     ),
                     child: Align(
                       alignment: Alignment.center,
