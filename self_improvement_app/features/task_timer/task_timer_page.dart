@@ -109,10 +109,25 @@ class TaskTimerPageState extends State<TaskTimerPage> {
                 width: MediaQuery.of(context).size.width * 0.85,
                 child: Column(
                   children: [
-                    Text(
-                      _currentScreen,
-                      style: TextStyle(fontSize: 24, color: Colors.white),
-                    ),
+                    if (_currentScreen == "Start new task")
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.04,
+                          left: MediaQuery.of(context).size.width * 0.2,
+                        ),
+                        child: Column(children: [
+                          Row(children: [ 
+                            TextButton(
+                              child: Text("Pomodoro", style: TextStyle(fontSize: 18)),
+                              onPressed: () {print("pressed pomodoro");},
+                            ),
+                            TextButton(
+                              child: Text("Break", style: TextStyle(fontSize: 18)),
+                              onPressed: () {print("pressed break");},
+                            ),
+                          ],)
+                        ],)
+                      ), //end of if
                   ],
                 ),
               ),
