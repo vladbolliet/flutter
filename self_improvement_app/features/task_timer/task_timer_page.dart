@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 class TaskTimerPage extends StatefulWidget {
   @override
@@ -113,7 +114,7 @@ class TaskTimerPageState extends State<TaskTimerPage> {
                       Padding(
                         padding: EdgeInsets.only(
                           top: MediaQuery.of(context).size.height * 0.04,
-                          left: MediaQuery.of(context).size.width * 0.2,
+                          left: MediaQuery.of(context).size.width * 0.06,
                         ),
                         child: Column(children: [
                           Row(children: [ 
@@ -122,16 +123,139 @@ class TaskTimerPageState extends State<TaskTimerPage> {
                               onPressed: () {print("pressed pomodoro");},
                             ),
                             TextButton(
+                              child: Text("Stopwatch", style: TextStyle(fontSize: 18)),
+                              onPressed: () {print("pressed stopwatch");},
+                            ),
+                            TextButton(
                               child: Text("Break", style: TextStyle(fontSize: 18)),
                               onPressed: () {print("pressed break");},
                             ),
-                          ],)
+
+                          ],),
+                          Center(child: PomodoroTimer()),
                         ],)
                       ), //end of if
                   ],
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PomodoroTimer extends StatefulWidget {
+  @override
+  _PomodoroTimerState createState() => _PomodoroTimerState();
+}
+
+class _PomodoroTimerState extends State<PomodoroTimer> {
+  Duration _duration = Duration(minutes: 50);
+  Duration _initialDuration = Duration(minutes: 50);
+  Timer? _timer;
+  bool _isRunning = false;
+
+  void _startTimer() {
+    if (_timer != null) {
+      _timer!.cancel();
+    }
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (_duration.inSeconds > 0) {
+        setState(() => _duration -= Duration(seconds: 1));
+      } else {
+        timer.cancel();
+        _isRunning = false;
+      }
+    });
+    setState(() => _isRunning = true);
+  }
+
+  void _pauseTimer() {
+    _timer?.cancel();
+    setState(() => _isRunning = false);
+  }
+
+  void _resetTimer() {
+    _timer?.cancel();
+    setState(() {
+      _duration = _initialDuration;
+      _isRunning = false;
+    });
+  }
+
+  void _setTime() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        TextEditingController minutesController = TextEditingController();
+        return AlertDialog(
+          title: Text("Set Timer"),
+          content: TextField(
+            controller: minutesController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(hintText: "Enter minutes"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                int? minutes = int.tryParse(minutesController.text);
+                if (minutes != null && minutes > 0) {
+                  setState(() {
+                    _duration = Duration(minutes: minutes);
+                    _initialDuration = _duration;
+                  });
+                }
+                Navigator.pop(context);
+              },
+              child: Text("Set"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String _formatTime() {
+    int minutes = _duration.inMinutes;
+    int seconds = _duration.inSeconds.remainder(60);
+    return "$minutes:${seconds.toString().padLeft(2, '0')}";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: _setTime,
+            child: Text(
+              _formatTime(),
+              style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+          ),
+          SizedBox(height: 5),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: _isRunning ? null : _startTimer,
+                child: Text("Start"),
+              ),
+              SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: _isRunning ? _pauseTimer : null,
+                child: Text("Pause"),
+              ),
+              SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: _resetTimer,
+                child: Text("Reset"),
+              ),
+            ],
           ),
         ],
       ),
