@@ -9,7 +9,7 @@ class TaskTimerPage extends StatefulWidget {
 class TaskTimerPageState extends State<TaskTimerPage> {
   bool _StartNewTaskIsExpanded = false;
   bool _ManualInputIsExpanded = false;
-  String _currentScreen = ""; // Tracks which screen is currently displayed
+  String _currentScreen = ""; // Tracks which screen is currently displayed, "Start new task", "Manual input", "Pomodoro", "Stopwatch"
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +77,6 @@ class TaskTimerPageState extends State<TaskTimerPage> {
                             if (_StartNewTaskIsExpanded) _StartNewTaskIsExpanded = false;
                             if (_ManualInputIsExpanded) _ManualInputIsExpanded = false;
                           });
-
                           // Wait for the animation to finish before resetting _currentScreen
                           Future.delayed(Duration(milliseconds: 450), () {
                             setState(() {
@@ -110,39 +109,42 @@ class TaskTimerPageState extends State<TaskTimerPage> {
                 width: MediaQuery.of(context).size.width * 0.85,
                 child: Column(
                   children: [
-                    if (_currentScreen == "Start new task")
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.04,
-                          left: MediaQuery.of(context).size.width * 0.06,
+                    if (_currentScreen == "Start new task") ... [
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.13),
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.1,
+                        child: TextButton(
+                          child: Text("Pomodoro", style: TextStyle(fontSize: 25)),
+                          onPressed: () {
+                            setState(() { _currentScreen = "Pomodoro"; });
+                            print("pressed pomodoro");
+                          },
                         ),
-                        child: Column(children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 40.0),
-                            child: Row(children: [ 
-                              TextButton(
-                                child: Text("Pomodoro", style: TextStyle(fontSize: 18)),
-                                onPressed: () {print("pressed pomodoro");},
-                              ),
-                              TextButton(
-                                child: Text("Stopwatch", style: TextStyle(fontSize: 18)),
-                                onPressed: () {
-                                  setState(() {
-                                    _currentScreen = "Stopwatch";
-                                  });
-                                  print("pressed stopwatch");
-                                },
-                              ),
-                            ],),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 18.0),
-                            child: PomodoroTimer(),
-                          ),
-                        ],)
-                      ), //end of if
-                    if (_currentScreen == "Stopwatch")
-                      StopwatchWidget(),
+                      ),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.1,
+                        child: TextButton(
+                          child: Text("Stopwatch", style: TextStyle(fontSize: 25)),
+                          onPressed: () {
+                            setState(() { _currentScreen = "Stopwatch"; });
+                            print("pressed stopwatch");
+                          },
+                        ),
+                      ),
+                    ]
+                    else if (_currentScreen == "Pomodoro") ... [
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                      Container(child: Text("choose task..."),),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.07),
+                      PomodoroTimer()
+                    ]
+                    else if (_currentScreen == "Stopwatch") ... [
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                      Container(child: Text("choose task..."),),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.09),
+                      StopwatchWidget()
+                    ]
                   ],
                 ),
               ),
@@ -162,6 +164,7 @@ class StopwatchWidget extends StatefulWidget {
 class _StopwatchWidgetState extends State<StopwatchWidget> {
   late Stopwatch _stopwatch;
   Timer? _timer;
+  bool _isRunning = false;
 
   @override
   void initState() {
@@ -170,30 +173,30 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
   }
 
   void _startStopwatch() {
-  if (!_stopwatch.isRunning) {
-    _stopwatch.start();
-    _timer?.cancel(); // Cancel any existing timer
-    _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-      setState(() {});
-    });
+    if (!_stopwatch.isRunning) {
+      _stopwatch.start();
+      _timer?.cancel(); // Cancel any existing timer
+      _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
+        setState(() {});
+      });
+      setState(() => _isRunning = true);
+    }
   }
-}
 
-void _pauseStopwatch() {
-  if (_stopwatch.isRunning) {
-    _stopwatch.stop();
+  void _pauseStopwatch() {
+    if (_stopwatch.isRunning) {
+      _stopwatch.stop();
+      _timer?.cancel();
+      setState(() => _isRunning = false); // Ensure UI updates when paused
+    }
+  }
+
+  void _resetStopwatch() {
+    _stopwatch.stop(); // Ensure it stops before resetting
+    _stopwatch.reset();
     _timer?.cancel();
-    setState(() {}); // Ensure UI updates when paused
+    setState(() => _isRunning = false); // Ensure UI updates when reset
   }
-}
-
-void _resetStopwatch() {
-  _stopwatch.stop(); // Ensure it stops before resetting
-  _stopwatch.reset();
-  _timer?.cancel();
-  setState(() {}); // Ensure UI updates when reset
-}
-
 
   String _formatTime(int milliseconds) {
     int hours = (milliseconds ~/ 3600000) % 60;
@@ -208,21 +211,22 @@ void _resetStopwatch() {
       padding: EdgeInsets.all(8),
       child: Column(
         children: [
-          Text("Stopwatch", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
           SizedBox(height: 10),
-          Text(_formatTime(_stopwatch.elapsedMilliseconds),
-              style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white)),
+          Text(
+            _formatTime(_stopwatch.elapsedMilliseconds),
+            style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
           SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: _startStopwatch,
+                onPressed: _isRunning ? null : _startStopwatch,
                 child: Text("Start"),
               ),
               SizedBox(width: 10),
               ElevatedButton(
-                onPressed: _pauseStopwatch,
+                onPressed: _isRunning ? _pauseStopwatch : null,
                 child: Text("Pause"),
               ),
               SizedBox(width: 10),
