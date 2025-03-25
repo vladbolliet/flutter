@@ -135,7 +135,9 @@ class TaskTimerPageState extends State<TaskTimerPage> {
                     ]
                     else if (_currentScreen == "Pomodoro") ... [
                       SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                      Container(child: Text("choose task..."),),
+                      // task chooser widget 
+                      ActivityChooser(),
+                      //Container(child: Text("choose task..."),),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.07),
                       PomodoroTimer()
                     ]
@@ -355,6 +357,90 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ActivityChooser extends StatefulWidget {
+  @override
+  _ActivityChooserState createState() => _ActivityChooserState();
+}
+
+class _ActivityChooserState extends State<ActivityChooser> {
+  String selectedActivity = "Choose activity";
+  List<String> activities = ["Running", "Swimming", "Cycling", "Reading", "Gaming", "HIIHII", "LOLOLOL", "HAHAHAH"];
+
+  void _showActivityChooser(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: Container(
+            width: 200, // Customize width
+            height: MediaQuery.of(context).size.height * 0.5, // Customize height
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Color.fromARGB(255, 53, 53, 53),
+            ),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 40),
+                  child: Row(
+                    children: [
+                      Text("Choose an activity", style: TextStyle(fontSize: 20, color: Colors.white)),
+                      Icon(Icons.arrow_drop_down),
+                    ],
+                  ),
+                ),
+                Divider(
+                  color: Colors.grey, // Line color
+                  thickness: 1,       // Line thickness
+                  height: 20,         // Space above and below the line
+                ),
+                SizedBox(height: 10),
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: activities.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(activities[index]),
+                      onTap: () {
+                        setState(() {
+                          selectedActivity = activities[index];
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ]
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: GestureDetector(
+        onTap: () => _showActivityChooser(context),
+        child: Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 68, 68, 68),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            selectedActivity,
+            style: TextStyle(color: selectedActivity == "Choose activity" ? Colors.grey : Colors.white),
+          ),
+        ),
       ),
     );
   }
