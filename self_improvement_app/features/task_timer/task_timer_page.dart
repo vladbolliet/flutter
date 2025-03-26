@@ -369,7 +369,7 @@ class ActivityChooser extends StatefulWidget {
 
 class _ActivityChooserState extends State<ActivityChooser> {
   String selectedActivity = "Choose activity";
-  List<String> activities = ["Running", "Swimming", "Cycling", "Reading", "Gaming", "HIIHII", "LOLOLOL", "HAHAHAH"];
+  List<String> activities = ["Running", "Swimming", "Cycling", "Reading", "Gaming", "HIIHII", "LOLOLOL", "DAMNDAMNDAMNDAMNADMNADMN"];
 
   void _showActivityChooser(BuildContext context) {
     showDialog(
@@ -378,8 +378,8 @@ class _ActivityChooserState extends State<ActivityChooser> {
         return Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Container(
-            width: 200, // Customize width
-            height: MediaQuery.of(context).size.height * 0.5, // Customize height
+            width: 200,
+            height: MediaQuery.of(context).size.height * 0.4,
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
@@ -392,7 +392,7 @@ class _ActivityChooserState extends State<ActivityChooser> {
                   child: Row(
                     children: [
                       Text("Choose an activity", style: TextStyle(fontSize: 20, color: Colors.white)),
-                      Icon(Icons.arrow_drop_down),
+                      Icon(Icons.expand_more, color: Colors.white),
                     ],
                   ),
                 ),
@@ -402,21 +402,40 @@ class _ActivityChooserState extends State<ActivityChooser> {
                   height: 20,         // Space above and below the line
                 ),
                 SizedBox(height: 10),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: activities.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(activities[index]),
-                      onTap: () {
-                        setState(() {
-                          selectedActivity = activities[index];
-                        });
-                        Navigator.pop(context);
+                SizedBox(
+                  height: 200, // Adjust height to fit 4 items
+                  child: Scrollbar(
+                    thumbVisibility: true, // Ensures the scrollbar is always visible when scrolling
+                    child: ListView.builder(
+                      itemCount: activities.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(activities[index]),
+                          onTap: () {
+                            setState(() {
+                              selectedActivity = activities[index];
+                            });
+                            Navigator.pop(context);
+                          },
+                        );
                       },
-                    );
-                  },
+                    ),
+                  ),
                 ),
+                /*Divider(
+                  color: Colors.grey, // Line color
+                  thickness: 1,       // Line thickness
+                  height: 20,         // Space above and below the line
+                ),*/
+                Padding(
+                  padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.5),
+                  child: TextButton(
+                    onPressed: (){
+                      print("pressed add new activity button");
+                    }, 
+                    child: Text("+", style: TextStyle(color: Colors.white, fontSize: 20)),
+                  ),
+                )
               ]
             ),
           ),
@@ -436,12 +455,26 @@ class _ActivityChooserState extends State<ActivityChooser> {
             color: const Color.fromARGB(255, 68, 68, 68),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Text(
-            selectedActivity,
-            style: TextStyle(color: selectedActivity == "Choose activity" ? Colors.grey : Colors.white),
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.28, // Fixed width
+            child: Row(
+              children: [
+                Expanded( // Prevents overflow
+                  child: Text(
+                    selectedActivity,
+                    overflow: TextOverflow.ellipsis, // Adds "..." if text is too long
+                    maxLines: 1, // Ensures single-line text
+                    style: TextStyle(
+                      color: selectedActivity == "Choose activity" ? Colors.grey : Colors.white,
+                    ),
+                  ),
+                ),
+                Icon(Icons.expand_more, color: Colors.grey),
+              ],
+            ),
           ),
         ),
       ),
-    );
+    ); 
   }
 }
