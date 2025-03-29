@@ -255,6 +255,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
   Duration _initialDuration = Duration(minutes: 50);
   Timer? _timer;
   bool _isRunning = false;
+  bool _hasStarted = false;  // Flag to track if the timer has ever been started
 
   void _startTimer() {
     if (_timer != null) {
@@ -265,10 +266,15 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
         setState(() => _duration -= Duration(seconds: 1));
       } else {
         timer.cancel();
-        _isRunning = false;
+        setState(() {
+          _isRunning = false;
+        });
       }
     });
-    setState(() => _isRunning = true);
+    setState(() {
+      _isRunning = true;
+      _hasStarted = true;  // Timer has started
+    });
   }
 
   void _pauseTimer() {
@@ -281,6 +287,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
     setState(() {
       _duration = _initialDuration;
       _isRunning = false;
+      _hasStarted = false;  // Reset the started flag
     });
   }
 
@@ -336,24 +343,54 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
               style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white),
             ),
           ),
-          SizedBox(height: 5),
+          SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(
-                onPressed: _isRunning ? null : _startTimer,
-                child: Text("Start"),
-              ),
-              SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: _isRunning ? _pauseTimer : null,
-                child: Text("Pause"),
-              ),
-              SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: _resetTimer,
-                child: Text("Reset"),
-              ),
+              if (_isRunning) ...[
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  child: ElevatedButton(
+                    onPressed: _pauseTimer,
+                    child: Icon(Icons.pause, size: 20),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  child: ElevatedButton(
+                    onPressed: _resetTimer,
+                    child: Icon(Icons.logout, size: 20),
+                  ),
+                ),
+              ] else ...[
+                // Show PLAY button only if the timer has not started yet
+                if (!_hasStarted) ... [
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    child: ElevatedButton(
+                      onPressed: _startTimer,
+                      child: Icon(Icons.play_arrow, size: 20),
+                    ),
+                  )
+                ]
+                else ... [
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    child: ElevatedButton(
+                      onPressed: _startTimer,
+                      child: Icon(Icons.play_arrow, size: 20),
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    child: ElevatedButton(
+                      onPressed: _resetTimer,
+                      child: Icon(Icons.logout, size: 20),
+                    ),
+                  )
+                ],
+              ],
             ],
           ),
         ],
@@ -361,6 +398,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
     );
   }
 }
+
 
 class ActivityChooser extends StatefulWidget {
   @override
@@ -462,39 +500,38 @@ class _ActivityChooserState extends State<ActivityChooser> {
 
   // Delete confirmation dialog
   void _showDeleteConfirmation(BuildContext context, int index) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color.fromARGB(253, 53, 53, 53),
-          title: Text("Confirm Delete", style: TextStyle(color: Colors.white)),
-          content: Text("Are you sure you want to delete '${activities[index]}'?", style: TextStyle(color: Colors.white)),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() { _longPressedIndex = null; });
-                Navigator.pop(context);
-                _showActivityChooser(context);
-              },
-              child: Text("Cancel", style: TextStyle(color: Colors.grey)),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  activities.removeAt(index);
-                  _longPressedIndex = null; // Reset long-pressed state
-                });
-                Navigator.pop(context); // Close confirmation
-                //Navigator.pop(context); // Close activity chooser
-                _showActivityChooser(context); // Reopen to refresh list
-              },
-              child: Text("Delete", style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: const Color.fromARGB(253, 53, 53, 53),
+        title: Text("Confirm Delete", style: TextStyle(color: Colors.white)),
+        content: Text("Are you sure you want to delete '${activities[index]}'?", style: TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() { _longPressedIndex = null; });
+              Navigator.pop(context); // Close dialog
+            },
+            child: Text("Cancel", style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                activities.removeAt(index);
+                _longPressedIndex = null; // Reset long-pressed state
+              });
+              Navigator.pop(context); // Close confirmation dialog
+              Navigator.pop(context); // Close activity chooser dialog
+              _showActivityChooser(context); // Reopen to refresh the list
+            },
+            child: Text("Delete", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   // Add new activity dialog
   void _showAddActivityDialog(BuildContext context) {
@@ -530,8 +567,7 @@ class _ActivityChooserState extends State<ActivityChooser> {
                     activities.add(newActivity);
                   });
                   Navigator.pop(context); // Close dialog
-                  Navigator.pop(context); // Close activity chooser
-                  _showActivityChooser(context); // Reopen to refresh
+                  //_showActivityChooser(context); // Reopen to refresh
                 }
               },
               child: Text("Add", style: TextStyle(color: Colors.white)),
