@@ -16,6 +16,7 @@ class TaskTimerPageState extends State<TaskTimerPage> {
   bool _manualInputIsExpanded = false;
   String _currentScreen = ""; // Tracks the current screen
   bool _isPomodoroPaused = false; // Tracks if the Pomodoro timer is paused
+  bool _isInInitialState = true; // Tracks if the timer is in its initial state
 
   @override
   Widget build(BuildContext context) {
@@ -45,15 +46,61 @@ class TaskTimerPageState extends State<TaskTimerPage> {
               ] else ...[
                 BackButtonWidget(
                   onPressed: () {
-                    setState(() {
-                      if (_startNewTaskIsExpanded) _startNewTaskIsExpanded = false;
-                      if (_manualInputIsExpanded) _manualInputIsExpanded = false;
-                    });
-                    Future.delayed(Duration(milliseconds: 450), () {
+                    if (_currentScreen == "Pomodoro" || _currentScreen == "Stopwatch") {
+                      // Check if the timer is not in its initial position
+
+                      if (!_isInInitialState) {
+                        // Show confirmation dialog
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Confirm"),
+                              content: Text(
+                                  "Are you sure you want to go back? All progress will be lost."),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(); // Close the dialog
+                                  },
+                                  child: Text("Cancel"),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(); // Close the dialog
+                                    // Perform the back action
+                                    setState(() {
+                                      if (_startNewTaskIsExpanded) _startNewTaskIsExpanded = false;
+                                      if (_manualInputIsExpanded) _manualInputIsExpanded = false;
+                                      _isPomodoroPaused = false;
+                                      _currentScreen = "";
+                                      _isInInitialState = true; // Reset the initial state flag
+                                    });
+                                  },
+                                  child: Text("Confirm"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        // Perform the back action directly if the timer is reset
+                        setState(() {
+                          if (_startNewTaskIsExpanded) _startNewTaskIsExpanded = false;
+                          if (_manualInputIsExpanded) _manualInputIsExpanded = false;
+                          _isPomodoroPaused = false;
+                          _currentScreen = "";
+                        });
+                      }
+                    } else {
+                      // Perform the back action directly for other screens
                       setState(() {
+                        if (_startNewTaskIsExpanded) _startNewTaskIsExpanded = false;
+                        if (_manualInputIsExpanded) _manualInputIsExpanded = false;
+                        _isPomodoroPaused = false;
                         _currentScreen = "";
                       });
-                    });
+                    }
                   },
                 ),
               ],
@@ -76,6 +123,13 @@ class TaskTimerPageState extends State<TaskTimerPage> {
             onPomodoroResume: () {
               setState(() {
                 _isPomodoroPaused = false;
+                _isInInitialState = false; // Reset the initial state flag
+                print("_isInInitialState set to false");
+              });
+            },
+            onInitialState: () {
+              setState(() {
+                _isInInitialState = true; // Reset the initial state flag
               });
             },
           ),
@@ -92,6 +146,7 @@ class AnimatedBox extends StatefulWidget {
   final Function(String) onScreenChange;
   final VoidCallback onPomodoroPause;
   final VoidCallback onPomodoroResume;
+  final VoidCallback onInitialState; // Callback for reset
 
   const AnimatedBox({
     required this.isExpanded,
@@ -100,6 +155,7 @@ class AnimatedBox extends StatefulWidget {
     required this.onScreenChange,
     required this.onPomodoroPause,
     required this.onPomodoroResume,
+    required this.onInitialState,
   });
 
   @override
@@ -152,6 +208,7 @@ class AnimatedBoxState extends State<AnimatedBox> {
                 PomodoroTimer(
                   onPause: widget.onPomodoroPause,
                   onResume: widget.onPomodoroResume,
+                  onInitialState: widget.onInitialState,
                 ),
               ] else if (widget.currentScreen == "Stopwatch") ...[
                 SizedBox(height: MediaQuery.of(context).size.height * 0.05),
@@ -183,11 +240,11 @@ class TaskOptionButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue, // Button background color
+          backgroundColor: const Color.fromARGB(255, 64, 64, 64), // Button background color
           foregroundColor: Colors.white, // Text color
           padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0), // Rounded corners
+            borderRadius: BorderRadius.circular(35.0), // Rounded corners
           ),
           elevation: 5, // Add shadow for a 3D effect
         ),

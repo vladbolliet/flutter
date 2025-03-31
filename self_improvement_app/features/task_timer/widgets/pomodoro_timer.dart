@@ -4,7 +4,8 @@ import 'dart:async';
 class PomodoroTimer extends StatefulWidget {
   final VoidCallback onPause; // Add a callback for pause
   final VoidCallback onResume; // Callback for resume
-  const PomodoroTimer({required this.onPause, required this.onResume});
+  final VoidCallback onInitialState; // Callback for reset
+  const PomodoroTimer({required this.onPause, required this.onResume, required this.onInitialState});
   @override
   _PomodoroTimerState createState() => _PomodoroTimerState();
 }
@@ -42,6 +43,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
       _hasStarted = true;  // Timer has started
     });
     widget.onResume(); // Notify parent when resumed
+    print("Timer started: onResume called"); // Debug print
   }
 
   void _pauseTimer() {
@@ -56,6 +58,8 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
       _duration = _initialDuration;
       _isRunning = false;
       _hasStarted = false;  // Reset the started flag
+      widget.onResume(); // Notify parent when reset
+      widget.onInitialState(); // Notify parent when reset
     });
   }
 
