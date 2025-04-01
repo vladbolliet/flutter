@@ -67,21 +67,36 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
     showDialog(
       context: context,
       builder: (context) {
+        TextEditingController hoursController = TextEditingController();
         TextEditingController minutesController = TextEditingController();
         return AlertDialog(
           title: Text("Set Timer"),
-          content: TextField(
-            controller: minutesController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(hintText: "Enter minutes"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: hoursController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(hintText: "Enter hours"),
+              ),
+              TextField(
+                controller: minutesController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(hintText: "Enter minutes"),
+              ),
+            ],
           ),
           actions: [
             TextButton(
               onPressed: () {
+                int? hours = int.tryParse(hoursController.text);
                 int? minutes = int.tryParse(minutesController.text);
-                if (minutes != null && minutes > 0) {
+                if ((hours != null && hours >= 0) || (minutes != null && minutes > 0)) {
                   setState(() {
-                    _duration = Duration(minutes: minutes);
+                    _duration = Duration(
+                      hours: hours ?? 0,
+                      minutes: minutes ?? 0,
+                    );
                     _initialDuration = _duration;
                   });
                 }
@@ -96,9 +111,15 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
   }
 
   String _formatTime() {
-    int minutes = _duration.inMinutes;
+    int hours = _duration.inHours;
+    int minutes = _duration.inMinutes.remainder(60);
     int seconds = _duration.inSeconds.remainder(60);
-    return "$minutes:${seconds.toString().padLeft(2, '0')}";
+
+    if (hours > 0) {
+      return "$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
+    } else {
+      return "$minutes:${seconds.toString().padLeft(2, '0')}";
+    }
   }
 
   @override
